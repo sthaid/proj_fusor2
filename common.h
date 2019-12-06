@@ -24,7 +24,7 @@ SOFTWARE.
 #define __COMMON_H__
 
 // port for connecting to get_neutron_data
-#define PORT 9001
+#define PORT 9002
 
 // camera config
 #define CAM_WIDTH       640

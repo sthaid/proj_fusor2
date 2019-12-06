@@ -79,7 +79,7 @@ enum mode {LIVE, PLAYBACK};
 #define MAGIC_DATA_PART1  0xaabbccdd55aa55aa
 #define MAGIC_DATA_PART2  0x77777777aaaaaaaa
 
-#define MAX_FILE_DATA_PART1   (6*3600)  // 6 hours
+#define MAX_FILE_DATA_PART1   (12*3600)  // 12 hours
 #define MAX_DATA_PART2_LENGTH 1000000
 
 #define FILE_DATA_PART2_OFFSET \
@@ -697,7 +697,6 @@ static void * get_live_data_thread(void * cx)
     struct data_part1_s * dp1;
     struct data_part2_s * dp2;
     neutron_data_t        lnd;
-    int32_t               time_deviation;
 
     INFO("starting\n");
 
@@ -748,9 +747,10 @@ static void * get_live_data_thread(void * cx)
         last_time_us = microsec_timer();
 
         // print time deviation
-        // XXX LATER, either print less often, say once per minute, or when it becomes large
-        time_deviation = time(NULL) - data_time;
-        INFO("time_deviation = %d secs\n", time_deviation);
+        if ((data_time % 60) == 0) {
+            int32_t time_deviation = time(NULL) - data_time;
+            INFO("time_deviation = %d secs\n", time_deviation);
+        }
 
         // populate data_t struct
         pthread_mutex_lock(&jpeg_mutex);
@@ -900,6 +900,9 @@ static void * neutron_data_thread(void * cx)
             if (program_terminating) {
                 break;
             }
+        }
+        if (program_terminating) {
+            break;
         }
 
         // create socket
@@ -1482,11 +1485,11 @@ static void draw_camera_image(rect_t * cam_pane, int32_t file_idx)
     }
     
     // decode the jpeg buff contained in data_part2
-    INFO("JPEG BUFF LEN %d\n", file_data_part1[file_idx].data_part2_jpeg_buff_len);
+    DEBUG("JPEG BUFF LEN %d\n", file_data_part1[file_idx].data_part2_jpeg_buff_len);
     ret = jpeg_decode(0,  // cxid
-                     JPEG_DECODE_MODE_YUY2,      
-                     data_part2->jpeg_buff, file_data_part1[file_idx].data_part2_jpeg_buff_len,
-                     &pixel_buff, &pixel_buff_width, &pixel_buff_height);
+                      JPEG_DECODE_MODE_YUY2,      
+                      data_part2->jpeg_buff, file_data_part1[file_idx].data_part2_jpeg_buff_len,
+                      &pixel_buff, &pixel_buff_width, &pixel_buff_height);
     if (ret < 0) {
         ERROR("jpeg_decode ret %d\n", ret);
         errstr = "DECODE";

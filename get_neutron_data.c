@@ -474,7 +474,7 @@ static int32_t mccdaq_callback(uint16_t * d, int32_t max_d)
                mccdaq_get_restart_count(), 
                (baseline-2048)*10000/2048);
         printf("\n");
-        INFO("=========================================================================\n");
+        INFO("===========================================\n");
         printf("\n");
 
         // reset for the next second

@@ -1,0 +1,7 @@
+*.o
+*.d
+*.dat
+*.log
+*.png
+get_neutron_data
+display

@@ -47,7 +47,6 @@ SOFTWARE.
 //#define ENABLE_TEST_THREAD
 
 #define DATAQ_DEVICE   "/dev/serial/by-id/usb-0683_1490-if00"
-#define STTY_SETTINGS  "4:0:14b2:0:3:1c:7f:15:1:0:1:0:11:13:1a:0:12:f:17:16:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0"
 #define MAX_RESP       100
 #define MAX_ADC_CHAN   9            // channels 1 .. 8
 #define MAX_VAL        10000
@@ -93,7 +92,7 @@ int32_t dataq_init(float averaging_duration_sec, int32_t scan_hz_arg, int32_t ma
 {
     char      cmd_str[500];
     char      resp[MAX_RESP];
-    int32_t   i, cnt, len, total_len, duration, ret, best_scan_hz;
+    int32_t   i, cnt, len, total_len, duration, best_scan_hz;
     char      adc_channels_str[100];
     char    * p;
     char      stop_buff[10000];
@@ -135,13 +134,11 @@ int32_t dataq_init(float averaging_duration_sec, int32_t scan_hz_arg, int32_t ma
     INFO("averaging_duration_sec=%4.2f channels=%s scan_hz=%d\n",
          averaging_duration_sec, adc_channels_str, scan_hz_arg);
 
-    // setup serial port
-    // - LATER perhaps use termios tcsetattr instead
-    // - I first ran this program on Fedora20, and had no problem
-    //   communicating to the dataq. When first run on RaspberryPi the
-    //   comm to dataq failed. To resolve this I captured the stty settings
-    //   on Fedora (stty -g) and apply them here.
-    sprintf(cmd_str, "stty -F %s %s\n", DATAQ_DEVICE, STTY_SETTINGS);
+    // configure serial port
+    // - 115200 baud
+    // - use <CR> for eol
+    // - no timeout and no minimum number of chars
+    sprintf(cmd_str, "sudo stty -F %s 115200 eol ^M -icanon time 0 min 0\n", DATAQ_DEVICE);
     system(cmd_str);
 
     // open the dataq virtual com port
@@ -153,18 +150,10 @@ int32_t dataq_init(float averaging_duration_sec, int32_t scan_hz_arg, int32_t ma
 
     // cleanup from prior run:
     // - issue 'stop' scanning command
-    // - set non blocking
     // - read until get the response to the stop command
-    // - clear non blocking
     len = write(dataq_fd, "stop\r", 5);
     if (len != 5) {
         ERROR("failed to write stop cmd, %s\n", strerror(errno));
-        goto error;
-    }
-
-    ret = fcntl(dataq_fd, F_SETFL, O_NONBLOCK);
-    if (ret < 0) {
-        ERROR("failed to set non blocking, %s\n", strerror(errno));
         goto error;
     }
 
@@ -185,12 +174,6 @@ int32_t dataq_init(float averaging_duration_sec, int32_t scan_hz_arg, int32_t ma
             goto error;
         }
     }        
-
-    ret = fcntl(dataq_fd, F_SETFL, 0);
-    if (ret < 0) {
-        ERROR("failed to clear non blocking, %s\n", strerror(errno));
-        goto error;
-    }
 
     // issue 'info 0' command, 
     // this is just a dataq communication sanity check
@@ -236,9 +219,6 @@ int32_t dataq_init(float averaging_duration_sec, int32_t scan_hz_arg, int32_t ma
     if (dataq_issue_cmd("bin", resp) < 0) {
         goto error;
     }
-
-    // start scan
-    write(dataq_fd, "start\r", 6);
 
     // stop scanning atexit
     atexit(dataq_exit_handler);
@@ -409,7 +389,7 @@ static void dataq_exit_handler()
 static int32_t dataq_issue_cmd(char * cmd, char * resp)
 {
     char cmd2[100];
-    int32_t len, ret, total_len, i;
+    int32_t len, total_len, i;
     char *p;
     bool resp_recvd;
 
@@ -421,13 +401,6 @@ static int32_t dataq_issue_cmd(char * cmd, char * resp)
     len = write(dataq_fd, cmd2, strlen(cmd2));
     if (len != strlen(cmd2)) {
         ERROR("failed write cmd '%s', %s\n", cmd, strerror(errno));
-        return -1;
-    }
-
-    // set non blocking
-    ret = fcntl(dataq_fd, F_SETFL, O_NONBLOCK);
-    if (ret < 0) {
-        ERROR("failed to set non blocking, %s\n", strerror(errno));
         return -1;
     }
 
@@ -457,13 +430,6 @@ static int32_t dataq_issue_cmd(char * cmd, char * resp)
         usleep(5000);
     }
 
-    // clear non blocking
-    ret = fcntl(dataq_fd, F_SETFL, 0);
-    if (ret < 0) {
-        ERROR("failed to clear non blocking, %s\n", strerror(errno));
-        return -1;
-    }
-
     // check for failure to read response
     if (!resp_recvd) {
         ERROR("response to cmd '%s' was not received\n", cmd);
@@ -486,17 +452,43 @@ static void * dataq_recv_data_thread(void * cx)
     uint8_t buff[1000];
     uint8_t *p;
     int32_t len, buff_len, slist_idx; 
+    uint64_t start_us;
 
     // init
     bzero(buff, sizeof(buff));
     buff_len = 0;
 
-    // verify start response received
-    len = read(dataq_fd, buff, 6);
-    if (len != 6 || memcmp(buff, "start\r", 6) != 0) {
-        ERROR("failed receive response to start, len=%d, %s\n", len, strerror(errno));
+    // send start command
+    len = write(dataq_fd, "start\r", 6);
+    if (len != 6) {
+        ERROR("failed to write start cmd, len=%d, %s\n", len, strerror(errno));
         return NULL;
     }
+
+    // verify response received for the start command
+    start_us = microsec_timer();
+    while (true) {
+        len = read(dataq_fd, buff+buff_len, 6-buff_len);
+        if (len < 0) {
+            ERROR("reading start response, len=%d, %s\n", len, strerror(errno));
+            return NULL;
+        }
+        buff_len += len;
+        if (buff_len == 6) {
+            break;
+        }
+        usleep(1000);
+        if (microsec_timer() - start_us > 1000000) {
+            ERROR("timeout reading start response\n");
+            return NULL;
+        }
+    }
+    if (memcmp(buff, "start\r", 6) != 0) {
+        ERROR("failed receive correct response to start\n");
+        return NULL;
+    }
+    bzero(buff, sizeof(buff));
+    buff_len = 0;
 
     // loop, read and process adc data
     while (true) {
@@ -547,6 +539,9 @@ static void * dataq_recv_data_thread(void * cx)
             // determine if scanning is working 
             scan_count++;
         }
+
+        // delay between reads
+        usleep(10000);
     }
 
     return NULL;
@@ -623,3 +618,4 @@ static void * dataq_monitor_thread(void * cx)
 
     return NULL;
 }        
+

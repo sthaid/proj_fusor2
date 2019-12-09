@@ -1,0 +1,63 @@
+===============================================
+INTRODUCTION
+===============================================
+
+This software is comprised of 2 programs:
+- get_neutron_data: reads neutron pulse data from an ADC, scans the data for pulses,
+                    and sends the pulse info to the display program using a TCP
+                    WIFI connection
+- display:          receives the neutron pulse data from the get_neutron_data program;
+                    also obtains fusor voltage, current, pressure, and grid image;
+                    and displays and records the data
+
+These 2 programs are run on seperate Raspberry Pi computers.
+
+Hardware Diagram ...
+
+                       +----------+                     +----------+
+                       |   RPI    |- - - - - wifi  - - -|   RPI    |--- Monitor
+   Ludlum---ADC2--usb--| get_     |                     | display  | 
+   Scaler              | neutron_ |        webcam--usb--| program  |--- usb wireless keyboard
+                       | data pgm |  Pirani--ADC1--usb--|          |
+                       +----------+         bluetooth---+----------+
+                            |                 |              |
+                         AC Power             |            AC Power
+                         Adapter              |            Adapter
+                                              |
+                                              | - bluetooth Multimeter for Fusor Voltage
+                                              | - bluetooth Multimeter for Fusor Current 
+
+
+    ADC1: Dataq Instruments DI-149. Specs: 10 kHz max sample rate, differential inputs.
+
+    ADC2: Measurement Computing USB-204. Specs 500 kHz max sample rate. SE Analog inputs.
+        This needs to be high sample rate because the pulses from the Ludlum scaler are only
+        about 2 us wide.
+
+    Pirani: analog output voltage from Kurt J Lesker 275i Pirani Gauge
+
+    Ludlum Scaler:  Ludlum 2929 Dual channel scaler.  This scaler has an Amp Out BNC 
+        connector, which is connected to ADC-2 through Resistor R.
+
+    Webcam: Logitech HD Laptop Webcam C615, 1080p.
+        "Premium autofocus for razor sharp images, even in close ups,"
+
+    Bluetooth Multimeters: 2x of Owon B35T Digital Multimeter with Bluetooth Interface.
+        The meter monitoring Fusor HV is set to measure microamps, and is connected in
+        series with the 1G ohm resistor. The meter monitoring Fusor Current is set to 
+        measure milliamps, and is connected between ground and the ground connection of
+        the power supply voltage multiplier. 
+
+The software can be obtained from https://github.com/sthaid/proj_fusor2.git. 
+Source code files are:
+- display.c          - the display prgram
+- get_neutron_data.c - the get_neutron_data progam
+Utilities
+- util_cam.c         - acquire streaming jpeg from webcam
+- util_jpeg_decode.c - convert jpeg to yuy2 pixel format
+- util_dataq.c       - interface to the Dataq Instruments DI-149 
+- util_mccdaq.c      - interface to the Measurement Computing USB-204
+- util_misc.c        - logging, time, etc
+- util_owon_b35.c    - acquire readings from the 2 bluetooth multimeters
+- util_sdl.c         - simplified interface to Simple Direct Media Layer
+- util_sdl_predefined_displays.c

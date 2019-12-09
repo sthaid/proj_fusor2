@@ -1,0 +1,25 @@
+==============================================
+DISPLAY PROGRAM USAGE
+==============================================
+
+Keyboard Controls:
+  Shift-Esc              : Quit
+  ?                      : Help
+  Ctrl-p, or Alt-p       : Capture Screenshot
+  Left, Right, Home, End : Summary Graph Time Select (*)
+  '-', '+'               : Summary Graph Time Scale
+  '1', '2'               : Adjust Neutron Pulse Data Graph Scale
+  '3', '4'               : Adjust Neutron Pulse Height Threshold
+  '5', '6'               : Adjust Neutron CPM Summary Graph Scale
+  'a', 'd', 'w', 'x'     : Camera Pan 
+  'z', 'Z'               : Camera Zoom
+  'r'                    : Camera Pan/Zoom Reset 
+  '>', '<'               : Adjust Playback Speed
+
+  (*) Use Ctl or Alt with Left/Right Arrow to increase response
+
+Program Options:
+  -h                           : help
+  -g <width>x<height>          : default = 1920x1000
+  -s <live-mode-data-server>   : default = rpi_data 
+  -p <playback-mode-file-name> : select playback mode

@@ -1,0 +1,3 @@
+#!/bin/bash
+cd /home/haid/proj_fusor2
+sudo ./get_neutron_data </dev/null &>>get_neutron_data.log &

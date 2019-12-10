@@ -1,11 +1,3 @@
-// XXX Pulses problem
-// - recreate the problem without running the fusor, disconnect the HV, from
-//   fusor, and run this program with the ludlum; vary voltage up to 30KV
-// - disconnect the VM, does the problm persis
-// - maybe relocating the speaker wire further away from ludlum will help
-// - if can't recreate the problem can try to recreate by
-//   - dummy load on the transformer
-//   - dummy load on the HV
 /*
 Copyright (c) 2019 Steven Haid
 
@@ -280,8 +272,9 @@ static int32_t mccdaq_callback(uint16_t * d, int32_t max_d)
     static int16_t  local_neutron_pulse_data[MAX_NEUTRON_PULSE][MAX_NEUTRON_ADC_PULSE_DATA];
     static int16_t  local_neutron_pulse_mv[MAX_NEUTRON_PULSE];
     static int32_t  local_max_neutron_pulse;
+    static uint64_t last_pulse_print_time_us;
 
-    #define TUNE_PULSE_THRESHOLD  10
+    #define TUNE_PULSE_THRESHOLD  100 
 
     #define RESET_FOR_NEXT_SEC \
         do { \
@@ -391,9 +384,6 @@ static int32_t mccdaq_callback(uint16_t * d, int32_t max_d)
             }
             pulse_height = pulse_height * 10000 / 2048;  // convert to mv
 
-            // XXX consider adding code here to skip this pule if its height is below a limit
-            // XXX alternatively just change TUNE_PULSE_THRESHOLD
-
             // if there is room to store another neutron pulse then
             // - store the pulse height
             // - store the pulse data
@@ -421,22 +411,27 @@ static int32_t mccdaq_callback(uint16_t * d, int32_t max_d)
                 local_max_neutron_pulse++;
             }
 
-            // plot the pulse 
-            pulse_start_idx_extended = pulse_start_idx - 1;
-            pulse_end_idx_extended = pulse_end_idx + 4;
-            if (pulse_start_idx_extended < 0) {
-                pulse_start_idx_extended = 0;
+            // print a plot of the pulse, but not more often than every 200 ms
+            if (microsec_timer() - last_pulse_print_time_us > 200000) {
+                pulse_start_idx_extended = pulse_start_idx - 1;
+                pulse_end_idx_extended = pulse_end_idx + 4;
+                if (pulse_start_idx_extended < 0) {
+                    pulse_start_idx_extended = 0;
+                }
+                if (pulse_end_idx_extended >= max_data) {
+                    pulse_end_idx_extended = max_data-1;
+                }
+
+                INFO("PULSE:  height_mv = %d   baseline_mv = %d   (%d,%d,%d)\n",
+                     pulse_height, (baseline-2048)*10000/2048,
+                     pulse_start_idx_extended, pulse_end_idx_extended, max_data);
+                for (i = pulse_start_idx_extended; i <= pulse_end_idx_extended; i++) {
+                    print_plot_str((data[i]-2048)*10000/2048, (baseline-2048)*10000/2048); 
+                }
+                BLANK_LINE;
+
+                last_pulse_print_time_us = microsec_timer();
             }
-            if (pulse_end_idx_extended >= max_data) {
-                pulse_end_idx_extended = max_data-1;
-            }
-            printf("PULSE:  height_mv = %d   baseline_mv = %d   (%d,%d,%d)\n",
-                   pulse_height, (baseline-2048)*10000/2048,
-                   pulse_start_idx_extended, pulse_end_idx_extended, max_data);
-            for (i = pulse_start_idx_extended; i <= pulse_end_idx_extended; i++) {
-                print_plot_str((data[i]-2048)*10000/2048, (baseline-2048)*10000/2048); 
-            }
-            printf("\n");
 
             // done with this pulse
             pulse_start_idx = -1;
@@ -468,14 +463,14 @@ static int32_t mccdaq_callback(uint16_t * d, int32_t max_d)
         pthread_mutex_unlock(&mutex);
 
         // print info, and seperator line 
-        printf("NEUTRON:  neutron_pulse=%d  mccdaq_samples=%d   mccdaq_restarts=%d   baseline_mv=%d\n",
+        INFO("NEUTRON:  neutron_pulse=%d  mccdaq_samples=%d   mccdaq_restarts=%d   baseline_mv=%d\n",
                local_max_neutron_pulse,
                max_data, 
                mccdaq_get_restart_count(), 
                (baseline-2048)*10000/2048);
-        printf("\n");
+        BLANK_LINE;
         INFO("===========================================\n");
-        printf("\n");
+        BLANK_LINE;
 
         // reset for the next second
         RESET_FOR_NEXT_SEC;

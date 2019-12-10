@@ -47,6 +47,12 @@ void logmsg(char *lvl, const char *func, char *fmt, ...)
     int     len;
     char    time_str[MAX_TIME_STR];
 
+    // if lvl is zero len string then print blank line
+    if (lvl[0] == '\0') {
+        printf("\n");
+        return;
+    }
+
     // construct msg
     va_start(ap, fmt);
     vsnprintf(msg, sizeof(msg), fmt, ap);

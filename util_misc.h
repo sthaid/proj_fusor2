@@ -43,6 +43,10 @@ SOFTWARE.
     do { \
         logmsg("ERROR", __func__, fmt, ## args); \
     } while (0)
+#define BLANK_LINE \
+    do { \
+        logmsg("", "", "blank_line"); \
+    } while (0)
 
 #ifdef ENABLE_LOGGING_AT_DEBUG_LEVEL
     #define DEBUG(fmt, args...) \

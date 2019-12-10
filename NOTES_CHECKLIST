@@ -1,6 +1,3 @@
-
-
-
       ===============================
       STARTUP CHECKLIST
       ===============================
@@ -63,8 +60,6 @@
       - check voltage, current, cps, and pressure readings    ___
         on the display program
 
-
-      
       Test Power Supply
       
       - power on                                              ___
@@ -125,8 +120,6 @@
       
       - adjust throttle valve for 15 mTorr D2 pressure        ____________  MTORR
       
-
-
       Ramp Up KV
       
       - turn on Geiger Counter, and note CPM                  ____________ CPM
@@ -150,8 +143,6 @@
 
       - Turn off Geiger Counter                               ___
 
-
-
       ===============================
       SHUTDOWN CHECKLIST
       ===============================
@@ -203,8 +194,6 @@
       
       Note Completion Time                                    ____________  TIME
 
-
-
       ===============================
       APPENDIX: CONDITIONS FOR FUSION
       ===============================

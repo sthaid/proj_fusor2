@@ -1633,7 +1633,7 @@ static void draw_summary_graph(rect_t * graph_pane, int32_t file_idx)
     max_values = 0;
     for (i = file_idx_start; i <= file_idx_end; i++) {
         voltage_kv_values[max_values]        = (i >= 0 && i < file_hdr->max)
-                                               ? file_data_part1[i].voltage_kv
+                                               ? -file_data_part1[i].voltage_kv
                                                : ERROR_NO_VALUE;
         current_ma_values[max_values]        = (i >= 0 && i < file_hdr->max)
                                                 ? file_data_part1[i].current_ma      

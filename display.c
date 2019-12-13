@@ -1,6 +1,3 @@
-// XXX check this stuff in, and update rpi_data to start the get_neutron_data pgm
-// XXX test upstairs with camera, and use get_neutron_data in basement
-
 /*
 Copyright (c) 2019 Steven Haid
 
@@ -294,8 +291,7 @@ static int32_t initialize(int32_t argc, char ** argv)
     setrlimit(RLIMIT_CORE, &rl);
 
     // print size of data part1 and part2, and validate sizes are multiple of 8
-    // XXX change these info prints to debug
-    INFO("sizeof data_t=%zd part1=%zd part2=%zd\n",
+    DEBUG("sizeof data_t=%zd part1=%zd part2=%zd\n",
           sizeof(data_t), sizeof(struct data_part1_s), sizeof(struct data_part2_s));
     if ((sizeof(struct data_part1_s) % 8) || (sizeof(struct data_part2_s) % 8)) {
         ERROR("sizeof data_t=%zd part1=%zd part2=%zd\n",
@@ -303,9 +299,12 @@ static int32_t initialize(int32_t argc, char ** argv)
         return -1;
     }
 
-    // print sizeof off_t
-    // XXX change these info prints to debug
-    INFO("sizeof off_t = %zd\n", sizeof(off_t));
+    // print sizeof off_t, and verify it is 8
+    DEBUG("sizeof off_t = %zd\n", sizeof(off_t));
+    if (sizeof(off_t) != 8) {
+        ERROR("sizeof off_t=%zd, must be 8\n", sizeof(off_t));
+        return -1;
+    }
 
     // init globals that are not 0
     mode = LIVE;
@@ -717,6 +716,7 @@ static void * get_live_data_thread(void * cx)
 
         // present local-neutron-data varaible to 'no data'
         memset(&lnd, 0, sizeof(lnd));
+        lnd.max_pulse = ERROR_NO_VALUE;
 
         // if neutron data has been received in the past 1.9 seconds then
         //   wait for up to 2 secs for next neutron data to be available, and
@@ -1732,7 +1732,9 @@ static void draw_adc_data_graph(rect_t * graph_pane, int32_t file_idx)
     // init array of the values to graph
     switch (adc_data_graph_select) {
     case 0:
-        if (dp2) {
+        // if we have neutron pulse data at this file_idx then 
+        // copy the pulse data to adc_data[]
+        if (dp1->max_neutron_pulse != ERROR_NO_VALUE && dp2) {
             k = 0;
             for (i = 0; i < dp1->max_neutron_pulse; i++) {
                 if (dp1->neutron_pulse_mv[i] >= neutron_pht_mv) {
@@ -2167,34 +2169,52 @@ static float neutron_cpm(int32_t file_idx)
             // if cached cps value is not available then compute it
             // based on current setting of neutron_pht_mv
             if (neutron_cps_cache[i] == -1) {
+                // if this file index (i) doesn't have neutron_pulse_data then
+                //   set neutron_cps_cache[i] to ERROR_NO_VALUE
+                // else
+                //   count the number of pulses which have height greater or
+                //    equal to the pulse-height-threshold, and
+                //   save the result in the neutron_cps_cache
+                // endif
                 struct data_part1_s * dp1 = &file_data_part1[i];
-
-                // sanity check dp1->magic
-                if (dp1->magic != MAGIC_DATA_PART1) {
-                    ERROR("dp1->magix 0x%"PRIx64" is not valid\n", dp1->magic);
-                    return ERROR_NO_VALUE;
-                }
-
-                // count the number of pulses which have height greater or
-                // equal to the pulse-height-threshold
-                cps = 0;
-                for (j = 0; j < dp1->max_neutron_pulse; j++) {
-                    if (dp1->neutron_pulse_mv[j] >= neutron_pht_mv) {
-                        cps++;
+                if (dp1->max_neutron_pulse == ERROR_NO_VALUE) {
+                    neutron_cps_cache[i] = ERROR_NO_VALUE;
+                } else {
+                    cps = 0;
+                    for (j = 0; j < dp1->max_neutron_pulse; j++) {
+                        if (dp1->neutron_pulse_mv[j] >= neutron_pht_mv) {
+                            cps++;
+                        }
                     }
+                    neutron_cps_cache[i] = cps;
                 }
-
-                // save the result in the neutron_cps_cache
-                neutron_cps_cache[i] = cps;
             }
 
-            // sum the cached cps values
+            // if cps is not available for file index (i) then
+            //   set sum to -1, and break;
+            //   if the code below observes that sum equals -1 then 
+            //    it will set neutron_cpm_average_cache to ERROR_NO_VALUE
+            // endif
+            if (neutron_cps_cache[i] == ERROR_NO_VALUE) {
+                sum = -1;
+                break;
+            }
+
+            // compute the sum of the cached cps values
             sum += neutron_cps_cache[i];
             n++;
         }
 
-        // compute cached average cpm value
-        neutron_cpm_average_cache[file_idx] = (float)sum / n * 60;
+        // if we have a valid sum then 
+        //   compute neutron_cpm_average_cache[file_idx]
+        // else
+        //   set neutron_cpm_average_cache[file_idx] to ERROR_NO_VALUE
+        // endif
+        if (sum != -1) {
+            neutron_cpm_average_cache[file_idx] = (float)sum / n * 60;
+        } else {
+            neutron_cpm_average_cache[file_idx] = ERROR_NO_VALUE;
+        }
     }
 
     // return the cached average cpm value

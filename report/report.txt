@@ -1,0 +1,231 @@
+[b][u]INTRODUCTION[/u][/b]
+
+I have replaced my Fusor's power supply. My goal was to use components that are easy to obtain, and at a reasonable cost.
+
+This new power supply did work in my Fusor, and produced 3000 CPM, as compared to 300 CPM from my previous power supply.
+
+[b][u]SAFETY[/u][/b]
+
+Extreme care is needed when working around high voltages. Do not touch anything until the voltages have diminished to zero. And always wear safety glasses.
+
+This power supply uses capacitors that can maintain a high voltage for a significant amount of time. 
+
+What I describe in this post is a prototype, thus the high voltage components are not contained in an enclosure. I was positioned well away from the power supply while the fusor is running, but while building and testing the power supply I did get closer to high voltages. It is important to have reliable instrumentation to detect high voltage and to be extremely careful not to touch anything when a voltage is present.
+
+[b][u]EFFORT[/u][/b]
+
+I found this to be a difficult but interesting project. It will take more time to build than other power supply approaches on fusor.net. And this approach is not inexpensive. However, the parts should be easy to obtain. And the result was good on my fusor.
+
+[b][u]DESIGN[/u][/b]
+
+A high frequency AC power supply is used. The output from this supply is connected to the primary winding of a step-up transformer. The output from the secondary winding is connected to a voltage multiplier, and the output from the voltage multiplier is connected to the Fusor.
+
+The HF AC supply used produces up to 60 volts peak (120 volts peak-to-peak), at 20KHZ. The transformer has a turns ratio of 70, so the output from the transformer is 4200 peak volts at 20KHZ. The Voltage Multiplier is 5X. The peak-to-peak input to the VM is 8400 volts, multiplying by 5 gives an output from the VM of 42 KV.
+
+The reasons for using a high frequency AC power supply are:
+[list]
+[*] An HF transformer requires fewer windings than what would be needed for a 60 HZ transformer. The transformer I wound has just 13 primary windings and 900 secondary windings.
+[*] The size of the capacitors needed in the VM are much lower. I used 14100 pf 10 KV capacitors in the VM. These are actually 3 4700 pf capacitors connected in parallel. These capacitors cost about $1.20 each. A total of 10 sets of 3 are used in the VM.
+[/list]
+
+[b][u]HF AC POWER SUPPLY[/u][/b]
+
+I used a Planet Audio 2600 Watt Bridgeable Car Amplifier to generate the 20 KHZ AC power. Bridgeable means that the 2 channels can be connected together to provide single channel output, at higher power. The 2600 Watts is described as 'MAX'. I believe this means that the continuous power output is substantially less than 2600 Watts.
+
+Input to the Car Amp is supplied by a signal generator. The signal generator I used is a dual channel Direct Digital Synthesis model that can produce various wave forms. I didn't need such an advanced signal generator, as all I need is a sine wave at 20 KHZ and with an adjustable voltage. However, the DDS signal generator cost only $70, and the additional features are nice to have.
+
+The Car Amp requires a 12 VDC power source. I used the Eyeboot 12V 50A DC Universal Regulated Switching Power Supply 600w. The first one I got failed, after a few months it wouldn't power on. It may have been defective or perhaps something I did. I sent a note to the manufacturer and they replaced it free of charge. And the new one has been working fine since then.
+
+I used 2 pairs of 10 AWG wire to connect the 12VDC supply to the Car Amp. The Wikipedia AWG page says the Ampacity of 10 AWG wire is 30 amps, Since I used a pair of 10 AWG wires the total Ampacity should be 60 amps.
+
+And I used 12 AWG speaker wire to connect the output of the Car Amp to the primary winding of the transformer.
+
+I tried to measure the output voltage from the Car Amp using a multimeter set to measure AC voltage, but this did not work with my multimeter. Perhaps 20 KHZ AC is too high a frequency for some multimeters to measure AC. Instead I made a meter using an analog 1 mA meter, diode, resistor, and capacitor. The Car Amp output goes to the diode, which is connected to the resistor, and then the meter. Across the resistor and meter is the capacitor. The resistor value is 100K so that that a 100V output would result in 1mA current, a full scale meter movement. And the capacitor value is chosen for a time constant much longer than the 20 KHZ period.
+
+Links to parts:
+Signal Generator - [url]https://www.amazon.com/gp/product/B071HJ31WN/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1[/url]
+DC 12V Power Supply - [url]https://www.amazon.com/gp/product/B00YRIRRS4/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1[/url]
+Car Amplifier - [url]https://www.amazon.com/gp/product/B003GSLE3K/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1[/url]
+12 Gauge Speaker Wire - [url]https://www.amazon.com/gp/product/B079VJXN1Z/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1[/url]
+
+
+[attachment=8]ac_power.jpg[/attachment]
+
+
+[b][u]TRANSFORMER[/u][/b]
+
+The transformer core I used are 2 U-Core with Ferrite N27 Core Material. The N27 Ferrite Core is appropriate for use in High Frequency Power Transformers. See this link for information on Ferrite Materials:
+[url]https://www.tdk-electronics.tdk.com/en/529404/products/product-catalog/ferrites-and-accessories/epcos-ferrites-and-accessories/ferrite-materials[/url]
+
+The 2 U-Cores are fastened together with a zip tie and wood shims are used to further tighten.
+
+The Primary is 13 wraps of 14 AWG wire. The Secondary is 900 wraps of 24 AWG Copper Magnet Wire. The wraps ratio is approximately 70. It is easiest to adjust the ratio by adding or removing wraps from the primary. The Ampacity of 24 AWG wire is 2.1 A, which is substantially more than needed.
+
+I tried to measure the insulation breakdown voltage of the 24 AWG Magnet wire used on the Secondary. The insulation did not break down at 880 VDC, which is the highest voltage that I tested. My Secondary has 23 layers with 39 wraps per layer. When the output of the Secondary is 4200 V, then the voltage per layer is 183 V, and the maximum voltage between adjacent layers is twice that, or 366 V. It seems that the insulation of the secondary magnet wire should be adequate. But, just for good measure I added a wrap of High Density PTFE Thread Tape between each layer. The PTFE Tape also helps to provide a smooth foundation for the next layer of wraps.
+
+To wind the transformer I made a jig to hold the bobbin and the wire spool. The jig utilizes 2 Fishing Reel Line Winders to hold the Bobbin and the Wire Spool. The jig also provided an adjustable wire guide. The jig was very helpful in making uniform windings and getting the secondary wound in reasonable amount of time.
+
+I designed the Bobbins on Tinkercad, and 3-D printed using Treatstock Kasza Printing. The 3-D printing cost was only about $23. Here are links to the bobbin designs on Tinkercad:
+[url]https://www.tinkercad.com/things/eO75SVBc5S2-daring-bombul-wolt[/url]
+[url]https://www.tinkercad.com/things/guosA7mRxRT-funky-bigery[/url]
+
+Links to parts:
+U-Cores  - [url]https://www.mouser.com/ProductDetail/871-B67370A0002X027[/url]
+Secondary Wire - [url]https://www.amazon.com/gp/product/B01NADBSXV/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1[/url]
+PTFE Tape - [url]https://www.amazon.com/gp/product/B008HPVVTE/ref=ppx_yo_dt_b_asin_title_o08_s00?ie=UTF8&psc=1[/url]
+Fishing Reel Line Winder - [url]https://www.ebay.com/itm/LS-2B-Fishing-Reel-Line-Winder-Linespooler-Spooling-Station-Line-Spooler/123462548688?ssPageName=STRK%3AMEBIDX%3AIT&_trksid=p2057872.m2749.l2649[/url]
+
+
+[attachment=2]transformer.jpg[/attachment]
+
+    
+[b][u]VOLTAGE MULTIPLIER[/u][/b]
+
+Wikipedia has an article on Voltage Multipliers. 
+
+A voltage multiplier multiplies the peak-to-peak AC voltage to a DC voltage. For example, a 2X VM using household 120 VAC input would create a 670 VDC output. This is because the 120 VAC is RMS voltage, the peak voltage is 1.4 x 120, or 168 V. And the household peak-to-peak voltage is 336 V.
+
+As mentioned earlier, I used 5X VM, to be able to multiply the 4200 VAC peak output of the transformer (8400 V peak-to-peak) to 42 KVDC.
+
+A voltage multiplier is a circuit consisting of diodes and capacitors. I had read an article that stated that the voltages within the VM are equally distributed among the capacitors. So, when using a 5X VM to generate 40KV, the maximum voltage across a capacitor would be 8 KV. To confirm this, and to help determine what the values of the capacitors need to be, I decided to write a computer program to simulate basic electric circuits. There are plenty of existing programs which simulate electric circuits, and they are probably all better than my program.
+
+My circuit simulator program showed that 14100 pf 10 KV capacitors should work well for a Fusor at 35 KV and 7 mA. There is more about my Circuit Simulator program later in this post.
+
+The diodes I used are 20KV 2A (PRHVP2A-20), and available on ebay for about $2 each. These diodes can't be tested using a multimeter diode tester. I recall having measured the voltage drop across these diodes to be about 15V. So, I think these diodes are actually constructed from 20 1KV diodes in series, encapsulated in epoxy.
+
+The capacitors I used are 4700pf 10KV Ceramic Disk Capacitors, available on ebay for about $1.20 each. I used 3 of these capacitors in parallel (14100 pf), for each capacitor needed in the VM circuit. These capacitors need to be in oil for the 10KV rating. I read a spec that says these capacitors will work at 5KV when not in oil, and when in oil will work up to 15KV.
+
+Links to parts:
+Capacitors - [url]https://www.ebay.com/itm/US-Stock-10pcs-Ceramic-Disc-Capacitors-4700pf-4-7nf-0-0047uf-472-10000V-10KV/391736076579?ssPageName=STRK%3AMEBIDX%3AIT&_trksid=p2057872.m2749.l2649[/url]
+Diodes - [url]https://www.ebay.com/itm/1-4-8-10pcs-PRHVP2A-20-Single-Phase-High-Voltage-Rectifier-Diode-2A-20000V-20KV/382968211462?hash=item592aaf2806:m:m2UZtwyXG9Ja637BR1E7QgA[/url]
+Mineral Oil 1 Gal - [url]https://store.steoil.com/crystal-plus-food-grade-mineral-oil-70fg-1-gal/[/url]
+
+
+[attachment=0]vm_5x.jpg[/attachment]
+
+
+[b][u]INSTRUMENTATION[/u][/b]
+
+My initial attempt to measure the voltage output from the VM was to use a voltage divider and multimeter to measure the voltage across the smaller resistor. This did not work well, when I repositioned the multimeter's leads the reading changed dramatically. I suspect that the HF or RF radiation from the VM or Transformer was being picked up by the multimeter leads, and affecting the reading.
+
+Instead, to measure voltage, I used the multimeter, in uA mode, in series with the 1G ohm resistor. Thus a reading on the multimeter of 30 uA would indicate a Fusor voltage of 30 KV. This seems to work well, but presented a problem of how to get this reading communicated from the multimeter to my data collection software. To solve this problem I found a Bluetooth Multimeter, the Owon B35T Multimeter, and also found sample code on GitHub which showed the method to access this multimeter via Bluetooth using the Linux gatttool program.
+
+To measure current, I employed a similar approach with a second Owon B35T Multimeter, this time set to read mA. The current measuring multimeter is connected from ground to the ground side of the transformer secondary which is also connected to the ground connection of the VM.
+
+I did have trouble establishing reliable connection from the Raspberry Pi to both of the multimeters simultaneously. I think the problem was due to both of the multimeters being positioned right next to each other, causing bluetooth interference. When I repositioned the meters about 1 foot apart the bluetooth connections became reliable.
+
+The software to read the Owon B35T multimeter is here:
+[url]https://github.com/sthaid/proj_fusor2/blob/master/util_owon_b35.c[/url]
+The software also monitors for failed bluetooth connections and when a failed connection is detected the software attempts to re-establish the connection.
+
+Link to parts:
+Owon B35T Multimeter - [url]https://www.amazon.com/gp/product/B017R3IE32/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1[/url]
+
+[b][u]BLOCK DIAGRAM[/u][/b]
+
+
+[attachment=7]block_diagram.png[/attachment]
+
+
+[list]
+[*] V1: 12 VDC Power Source for Car Amp
+[*] T1: 70x Step Up Transformer
+[*] R1: 50K Ballast resistor
+[*] R2: Safety ground connection in case of M1 failure
+[*] R3: 1G ohm resistor 
+[*] M1: Fusor milliamp meter
+[*] M2: Fusor voltage meter, 1 uA reading = 1 KV
+[/list]
+
+Thanks to [url]https://www.digikey.com/schemeit[/url] for the tool used to make this block diagram. To create the png file I printed to pdf and then used Fedora Linux Shift-PrtScn to captue the screenshot png file.
+
+[b][u]SOME PROBLEMS ENCOUNTERED[/u][/b]
+
+Various problems were encountered. None too serious, but they did take time to resolve. I would guess that if someone else makes a power supply like this that they would run into different problems.
+
+[list]
+[*] The 12 VDC power supply for the Car Amp failed and was replaced for free by the manufacturer.
+[*] The 5V 2A power adapter for the Signal Generator failed. I replaced it with a 5V 3A power adapter.
+[*] Bluetooth connections to the 2 Owon B35T multimeters were not reliable. This was resolved by moving the multimeters apart by about 1 foot.
+[*] The Owon B35T Multimeter measuring fusur voltage started oscillating instead of displaying a stable voltage. This occurred during testing without the fusor connected to the VM's output. This was resolved by repositioning the transformer's secondary ground wire so that it no longer was in contact with the transformer core.
+[*] When testing the power supply with the fusor ignited, I tried increasing the power to the fusor, from 7.5 to 9.3 mA. After about 10 seconds running at 9.3 mA the power supply failed. I traced the failure to a capacitor in the VM. And replaced the capacitor, which resolved the problem. I don't know why the capacitor failed, I guess it may have been defective, or perhaps extreme conditions within the VM at this higher current caused the failure. After replacing the capacitor I ran the fusor again for about 4 minutes at 36 KV / 7 mA, without problem.
+[/list]
+
+[b][u]RESULTS[/u][/b]
+
+Here is a screenshot from a fusor run using the new power supply. Compared to my previous power supply the voltage applied to the fusor has increased from 30 KV to 35 KV. And the neutron count rate has increased from 300 CPM to 3000 CPM.
+
+
+[attachment=4]fusor_191214_102144_screenshot_3.png[/attachment]
+
+[attachment=3]system_view.jpg[/attachment]
+
+[attachment=1]transformer_and_vm.jpg[/attachment]
+
+
+[b][u]COST OF THE MAJOR COMPONENTS[/u][/b]
+
+[code]
+Signal Generator                            70
+Planet Audio Car Amp                       100
+12Vdc 50A power supply                      55
+2 U-Cores  ($51 each)                      102
+3D Printed Bobbins                          23
+Secondary Wire (791 ft)                     30
+Secondary Bobbin Winding Jig                40
+VM diodes  10 @ $2.00                       20
+VM caps    30 @ $1.20                       36
+VM Mineral Oil (1 gallon)                   20
+1G resistor                                 40
+2 Bluetooth Multimeters ($55 each)         110
+                                          ----
+                                         $ 646
+[/code]
+
+[b][u]ADDITIONAL INFO - UPDATES TO MY FUSOR SOFTWARE[/u][/b]
+
+To accommodate the new method of obtaining the Fusor Voltage and Current from the Bluetooth Multimeters, the software ...
+
+[list]
+[*]Still using the 2 Raspberry Pi computers.
+[*]The get_neutron_data program on one of the Raspberry Pi computers is now dedicated to reading and scanning the ADC data from the Ludlum Scaler, to count the number of neutrons detected.
+[*]The display program running on the other Raspberry Pi collects the data from the Webcam, Pirani Pressure Gauge, Voltage and Current Bluetooth Multimeters, and receives the neutron detector CPM from the get_neutron_data program running on the other raspberry PI. These data values are displayed and graphed, and are saved to a data file so they can be reviewed later.
+[/list]
+
+The Software is available at [url]https://github.com/sthaid/proj_fusor2.git[/url]
+
+[b][u]ADDITIONAL INFO - MY CIRCUIT SIMULATOR PROGRAM[/u][/b]
+
+Other, probably much better, circuit simulators are available, and free to use. For example LTspice. I have not tried them.
+
+My circuit simulator software is available here [url]https://github.com/sthaid/proj_circsim.git[/url]
+
+How it works ...
+
+This program simulates circuits that are comprised of resistors, capacitors, inductors, diodes, and AC or DC power supplies.
+
+The eval_circuit_for_delta_t routine, in model.c, is the core of the simulation. This routine determines the new circuit state (voltages and currents) after a short time interval (delta_t). Kirchoff's current law, Ohms law, and the Current-Voltage relationship for capacitors and inductors are used.
+
+The eval_circuit_for_delta_t routine does the following
+[list]
+[*] Loop over all nodes, and for each node determine an estimate for the next voltage following the short delta_t interval. This estimate is computed by choosing a voltage that satisfies Kirchoff's current law, using the values of the components attached to this node and state of adjacent nodes as input.
+[*] Based on the voltages computed in step 1, determine the current passing through each component, which is equivalent to the current at the node terminals that the component is attached to.
+[*] One might expect that the sum of the currents, for each node, calculated in step 2, would be 0. However, this is not the case because the next voltages calculated in step 1 do not incorporate changes in the voltage of the adjacent nodes. So, step 3 will sum the current for each node, and if any node's total current is significantly not zero then repeat from step 1. After a sufficient number of iterations all of the nodes currents will be nearly zero, in which case this routine has completed computing the next circuit state.
+[/list]
+
+To evaluate the circuit for a long time interval (many delta_t), the eval_circuit_for_delta_t routine is called many times until the circuit has been simulated for the desired interval.
+
+Tests ...
+
+Various test circuits are in the tests directory. For example test/r3 solves the problem of determining the resistance across a single resistor in an infinite grid of 1 ohm resistors. See screenshot attached below, which shows that a 1 volt power source connected across a resistor has 2 amps of current. Using ohms law the resistance is 0.5 ohms. This is the correct answer, but this resistor problem is really meant to be solved using logic and not by a circuit simulator.
+
+
+[attachment=6]circsim_resistor_grid.jpg[/attachment]
+
+
+And here is a simulation screenshot of the 5X voltage multiplier used in this power supply.
+
+
+[attachment=5]circsim_vm5x_screenshot.jpg[/attachment]
+
+

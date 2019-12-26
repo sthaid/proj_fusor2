@@ -1,0 +1,78 @@
+=========================================
+FUSOR.NET POST
+=========================================
+
+https://fusor.net/board/viewtopic.php?f=6&t=11581&sid=456f4e7b4e4f2b7fc8e77652e4d3f3d8&start=10
+
+=========================================
+FUSOR.NET POST FORMAT EXAMPLES
+=========================================
+
+[b][u]SUMMARY[/u][/b]
+
+[b]Vacuum Chamber[/b]
+
+[url]xxxxxxxxxxxxxxxxx[/url]
+
+[attachment=0]system.jpg[/attachment]
+
+[list]
+[*] The upper left is the image from the camera.
+[*] The Neutron ADC gger than the NPHT are displayed.
+[/list]
+
+[code]
+xxxx
+xxxx
+[/code]
+
+=========================================
+CREATING ATTACHMENTS WITH IMAGE_MERGE
+=========================================
+
+image_merge -o 1024 -c 3 -f attachments/ac_power.jpg \
+   image_inputs/signal_generator.jpg  \
+   image_inputs/car_amp_and_power_supply.jpg  \
+   image_inputs/car_amp_output_meter.jpg 
+
+image_merge -o 1024 -f attachments/transformer.jpg \
+   image_inputs/bobbin_winder.jpg  \
+   image_inputs/bobbin_partially_wound.jpg \
+   image_inputs/finished_transformer2.jpg \
+   image_inputs/finished_transformer3.jpg
+
+image_merge -o 1024 -f attachments/vm_5x.jpg \
+   image_inputs/vm.jpg \
+   image_inputs/vm_in_oil.jpg
+
+image_merge -o 1024 -f attachments/system_view.jpg \
+   image_inputs/system2.jpg
+
+image_merge -o 1024 -f attachments/transformer_and_vm.jpg \
+   image_inputs/transformer_v_and_meters_2.jpg
+
+=========================================
+BLOCK DIAGRAM 
+=========================================
+
+Made using https://www.digikey.com/schemeit/project/
+
+Location of some symbols in the digikey schemeit tool:
+  schematic symbols
+     passives          resistor
+     sources           battery
+     transformers      step up
+     test equipment    ammeter
+     ports             ground
+  diagram symbols
+     arrows  
+     basic shapes      rounded rectangle
+
+Creating PNG file
+  1) schemeit print
+  2) print to pdf
+  3) evince xxx.pdf
+  4) screen capture:
+      Shift PRSCRN = select an area of the screen
+      Alt PRSCRN   = current window
+      

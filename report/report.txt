@@ -131,7 +131,7 @@ Owon B35T Multimeter - [url]https://www.amazon.com/gp/product/B017R3IE32/ref=ppx
 [*] V1: 12 VDC Power Source for Car Amp
 [*] T1: 70x Step Up Transformer
 [*] R1: 50K Ballast resistor
-[*] R2: Safety ground connection in case of M1 failure
+[*] R2: Safety ground connection in case of M1 failure, 100 ohm
 [*] R3: 1G ohm resistor 
 [*] M1: Fusor milliamp meter
 [*] M2: Fusor voltage meter, 1 uA reading = 1 KV
@@ -148,7 +148,7 @@ Various problems were encountered. None too serious, but they did take time to r
 [*] The 5V 2A power adapter for the Signal Generator failed. I replaced it with a 5V 3A power adapter.
 [*] Bluetooth connections to the 2 Owon B35T multimeters were not reliable. This was resolved by moving the multimeters apart by about 1 foot.
 [*] The Owon B35T Multimeter measuring fusur voltage started oscillating instead of displaying a stable voltage. This occurred during testing without the fusor connected to the VM's output. This was resolved by repositioning the transformer's secondary ground wire so that it no longer was in contact with the transformer core.
-[*] When testing the power supply with the fusor ignited, I tried increasing the power to the fusor, from 7.5 to 9.3 mA. After about 10 seconds running at 9.3 mA the power supply failed. I traced the failure to a capacitor in the VM. And replaced the capacitor, which resolved the problem. I don't know why the capacitor failed, I guess it may have been defective, or perhaps extreme conditions within the VM at this higher current caused the failure. After replacing the capacitor I ran the fusor again for about 4 minutes at 36 KV / 7 mA, without problem.
+[*] When testing the power supply with the fusor ignited, I tried increasing the power to the fusor, from 7.5 to 9.3 mA. After about 10 seconds running at 9.3 mA the power supply failed. I traced the failure to a capacitor in the VM. And replaced the capacitor, which resolved the problem. I don't know why the capacitor failed. It may have been defective. Or, the Car Amp may have been clipping, which could cause voltage spikes at the transformer output which exceeded the capacitor voltage spec. After replacing the capacitor I ran the fusor again for about 4 minutes at 36 KV / 7 mA, without problem.
 [/list]
 
 [b][u]RESULTS[/u][/b]

@@ -88,6 +88,21 @@ static void * dataq_monitor_thread(void * cx);
 
 // -----------------  DATAQ API ROUTINES  -----------------------------------------------
 
+#ifdef UNIT_TEST
+int main(int argc, char**argv)
+{
+    dataq_init(0.5,   // averaging duration in secs
+               1200,  // scan rate  (samples per second)
+               1,     // number of adc channels
+               3);  //DATAQ_ADC_CHAN_PRESSURE);
+
+    INFO("PAUSING\n");
+    while (1) pause();
+
+    return 0;
+}
+#endif
+
 int32_t dataq_init(float averaging_duration_sec, int32_t scan_hz_arg, int32_t max_adc_chan, ...)
 {
     char      cmd_str[500];
@@ -134,12 +149,24 @@ int32_t dataq_init(float averaging_duration_sec, int32_t scan_hz_arg, int32_t ma
     INFO("averaging_duration_sec=%4.2f channels=%s scan_hz=%d\n",
          averaging_duration_sec, adc_channels_str, scan_hz_arg);
 
+#if 0
     // configure serial port
     // - 115200 baud
     // - use <CR> for eol
     // - no timeout and no minimum number of chars
     sprintf(cmd_str, "sudo stty -F %s 115200 eol ^M -icanon time 0 min 0\n", DATAQ_DEVICE);
     system(cmd_str);
+#else
+    // setup serial port
+    // - LATER perhaps use termios tcsetattr instead
+    // - I first ran this program on Fedora20, and had no problem
+    //   communicating to the dataq. When first run on RaspberryPi the
+    //   comm to dataq failed. To resolve this I captured the stty settings
+    //   on Fedora (stty -g) and apply them here.
+    #define STTY_SETTINGS  "4:0:14b2:0:3:1c:7f:15:1:0:1:0:11:13:1a:0:12:f:17:16:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0"
+    sprintf(cmd_str, "stty -F %s %s\n", DATAQ_DEVICE, STTY_SETTINGS);
+    system(cmd_str);
+#endif
 
     // open the dataq virtual com port
     dataq_fd = open(DATAQ_DEVICE, O_RDWR);
@@ -164,6 +191,7 @@ int32_t dataq_init(float averaging_duration_sec, int32_t scan_hz_arg, int32_t ma
         len = read(dataq_fd, stop_buff+total_len, sizeof(stop_buff)-total_len);
         if (len > 0) {
             total_len += len;
+            stop_buff[total_len] = '\0';
             if (total_len >= 5 && strcmp(&stop_buff[total_len-5], "stop\r") == 0) {
                 break;
             }

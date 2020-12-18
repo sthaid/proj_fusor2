@@ -22,9 +22,9 @@
 // defines
 //
 
-#define VERBSOE 
+#define VERBOSE 
 
-#define INTVL_US (10 * (uint64_t)1000000)
+#define INTVL_US (3600 * (uint64_t)1000000)
 
 #define FILENAME "neutron_test.out"
 
@@ -276,7 +276,7 @@ static int32_t mccdaq_callback(uint16_t * d, int32_t max_d)
             local_max_neutron_pulse++;
 
 #ifdef VERBOSE
-            int32_t pulse_height, i, k;
+            int32_t pulse_height, i;
             int32_t pulse_start_idx_extended, pulse_end_idx_extended;
 
             // scan from start to end of pulse to determine pulse_height,

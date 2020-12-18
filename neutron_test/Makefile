@@ -11,7 +11,7 @@ OBJ_NEUTRON_TEST=$(SRC_NEUTRON_TEST:.c=.o)
 
 DEP=$(SRC_NEUTRON_TEST:.c=.d)
 
-MCCDAQ_TEST=true
+MCCDAQ_TEST=
 
 #
 # build rules

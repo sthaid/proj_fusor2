@@ -22,7 +22,8 @@
 // defines
 //
 
-#define VERBOSE 
+#define VERBOSE_PULSES
+//#define VERBOSE_INFO
 
 #define INTVL_US (3600 * (uint64_t)1000000)
 
@@ -163,7 +164,7 @@ static char *graph(int32_t count)
 
 // -----------------  MCCDAQ CALLBACK - NEUTRON DETECTOR PULSES  ---------------------
 
-#ifdef VERBOSE
+#ifdef VERBOSE_PULSES
 static void print_plot_str(int32_t value, int32_t baseline);
 #endif
 
@@ -275,7 +276,7 @@ static int32_t mccdaq_callback(uint16_t * d, int32_t max_d)
             // increment local_max_neutron_pulse
             local_max_neutron_pulse++;
 
-#ifdef VERBOSE
+#ifdef VERBOSE_PULSES
             int32_t pulse_height, i;
             int32_t pulse_start_idx_extended, pulse_end_idx_extended;
 
@@ -330,17 +331,30 @@ static int32_t mccdaq_callback(uint16_t * d, int32_t max_d)
     uint64_t time_now = time(NULL);
     static uint64_t time_last_published;
     if (time_now > time_last_published) {    
+        int32_t mccdaq_restart_count, baseline_mv;
+
         // publish new neutron data
         neutron_data_max_pulse = local_max_neutron_pulse;
         time_last_published = time_now;
 
-#ifdef VERBOSE
+        // print warning if there are mccdaq_restarts, or other concerns
+        mccdaq_restart_count = mccdaq_get_restart_count();
+        baseline_mv = (baseline - 2048) * 10000 / 2048;
+        if (mccdaq_restart_count != 0 ||
+            max_data < 480000 || max_data > 520000 ||
+            baseline_mv < 1500 || baseline_mv > 1800)
+        {
+            WARN("mccdaq_restart_count=%d max_data=%d baseline_mv=%d\n",
+                  mccdaq_restart_count, max_data, baseline_mv);
+        }
+
+#ifdef VERBOSE_INFO
         // print info, and seperator line 
         INFO("NEUTRON:  neutron_pulse=%d  mccdaq_samples=%d   mccdaq_restarts=%d   baseline_mv=%d\n",
                local_max_neutron_pulse,
                max_data, 
-               mccdaq_get_restart_count(), 
-               (baseline-2048)*10000/2048);
+               mccdaq_restart_count, 
+               baseline_mv);
         BLANK_LINE;
         INFO("===========================================\n");
         BLANK_LINE;
@@ -354,7 +368,7 @@ static int32_t mccdaq_callback(uint16_t * d, int32_t max_d)
     return 0;
 }
 
-#ifdef VERBOSE
+#ifdef VERBOSE_PULSES
 static void print_plot_str(int32_t value, int32_t baseline)
 {
     char    str[110];

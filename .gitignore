@@ -2,5 +2,5 @@
 *.d
 get_neutron_data
 display
-neutron_test
+neutron_test/neutron_test
 neutron_test.out

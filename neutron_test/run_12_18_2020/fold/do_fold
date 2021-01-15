@@ -1,0 +1,43 @@
+#!/bin/bash
+
+gcc -Wall -Werror -o fold -lm fold.c
+if [ $? -ne 0 ]; then
+  echo "ERROR: gcc failed"
+  exit
+fi
+
+if [ "$1" != "" ]; then
+  range_start=$1
+  if [ $range_start -lt 352 ]; then
+    range_start=352.5
+  fi
+else
+  range_start=359
+fi
+range_end=369.5
+
+./fold $range_start $range_end <../neutron_test.out.rescaled >fold.dat
+if [ $? -ne 0 ]; then
+  echo "ERROR: fold failed"
+  exit
+fi
+
+echo
+cat fold.dat
+echo
+
+term_size="1000,500"
+size_ratio=0.50
+
+gnuplot -p \
+  -e "set term x11 size $term_size" \
+  -e "set size ratio $size_ratio" \
+  -e "set xrange [*:*]" \
+  -e "f(x) = a + b * cos(pi + (2*pi) * (x - d/24))" \
+  -e "a=400" \
+  -e "b=100" \
+  -e "d=0.1" \
+  -e "fit f(x) 'fold.dat' via a,b,d" \
+  -e "plot f(x) linewidth 2, 'fold.dat' with lines linewidth 2"
+
+rm fold fit.log

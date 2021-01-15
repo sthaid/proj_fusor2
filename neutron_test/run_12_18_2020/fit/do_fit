@@ -1,0 +1,43 @@
+#!/bin/bash
+
+term_size="1600,800"
+size_ratio=0.50
+
+file=../neutron_test.out.rescaled
+
+if [ "$1" != "" ]; then
+  range_start=$1
+  if [ $range_start -lt 352 ]; then
+    range_start=352.5
+  fi
+else
+  range_start=359
+fi
+range_end=369.5
+
+echo
+echo "Range $range_start ... $range_end"
+echo
+
+if [ "$2" = "skip_fit" ]; then
+  gnuplot -p \
+    -e "set term x11 size $term_size" \
+    -e "set size ratio $size_ratio" \
+    -e "set xrange [$range_start:$range_end]" \
+    -e "plot '$file' with lines linewidth 2"
+  exit
+fi
+
+gnuplot -p \
+  -e "set term x11 size $term_size" \
+  -e "set size ratio $size_ratio" \
+  -e "set xrange [$range_start:$range_end]" \
+  -e "f(x) = a + b * cos(pi + (2*pi*c) * (x - $range_start - d/24))" \
+  -e "a=400" \
+  -e "b=100" \
+  -e "c=1" \
+  -e "d=3" \
+  -e "fit f(x) '$file' via a,b,c,d" \
+  -e "plot f(x) linewidth 2, '$file' with lines linewidth 2"
+
+rm fit.log

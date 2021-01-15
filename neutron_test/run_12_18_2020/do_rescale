@@ -1,0 +1,11 @@
+#!/bin/bash
+
+gcc -Wall -Werror -lm -o rescale rescale.c
+if [ $? -ne 0 ]; then
+  echo COMPILE FAILED
+  exit
+fi
+
+rescale < neutron_test.out > neutron_test.out.rescaled
+
+

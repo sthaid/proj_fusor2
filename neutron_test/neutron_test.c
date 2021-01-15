@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <limits.h>
+#include <math.h>
 
 #include <pthread.h>
 #include <signal.h>
@@ -44,7 +45,7 @@ static bool    sigint_or_sigterm;
 //
 
 static void signal_handler(int sig);
-static char *graph(int32_t count);
+static char *graph(int32_t pulses);
 static int32_t mccdaq_callback(uint16_t * d, int32_t max_d);
 
 // -----------------  MAIN & TOP LEVEL ROUTINES  -------------------------------------
@@ -109,7 +110,7 @@ int32_t main(int32_t argc, char **argv)
         if (microsec_timer() > end_us) {
             time_t t;
             struct tm *tm;
-            char str[1000];
+            char str[2000];
             double days;
 
             t = (get_real_time_us() - INTVL_US/2) / 1000000;
@@ -122,7 +123,7 @@ int32_t main(int32_t argc, char **argv)
             snprintf(str, sizeof(str), 
                      "%8.3f %4d   # %02d/%02d/%02d %02d:%02d:%02d - %s", 
                      days, sum,
-                     tm->tm_mon+1, tm->tm_mday, tm->tm_year, tm->tm_hour, tm->tm_min, tm->tm_sec, 
+                     tm->tm_mon+1, tm->tm_mday, tm->tm_year+1900, tm->tm_hour, tm->tm_min, tm->tm_sec, 
                      graph(sum));
 
             INFO("%s\n", str);
@@ -143,22 +144,22 @@ static void signal_handler(int sig)
     sigint_or_sigterm = true;
 }
 
-static char *graph(int32_t count)
+static char *graph(int32_t pulses)
 {
-    #define MAX_GRAPH 100
-    static char graph[MAX_GRAPH+10];
+    static char str[1000];
+    int num_stars;
 
-    // XXX will need to scale count
+    num_stars = nearbyint(pulses / 10.);
 
-    if (count <= MAX_GRAPH) {
-        memset(graph, '*', count);
-        graph[count] = 0;
-    } else {
-        memset(graph, '*', MAX_GRAPH);
-        strcpy(graph+MAX_GRAPH-3, "==>");
+    if (num_stars >= sizeof(str)-1) {
+        printf("ERROR: pulses %d too large\n", pulses);
+        exit(1);
     }
 
-    return graph;
+    memset(str, '*', num_stars);
+    str[num_stars] = '\0';
+
+    return str;
 }
 
 // -----------------  MCCDAQ CALLBACK - NEUTRON DETECTOR PULSES  ---------------------

@@ -41,9 +41,10 @@ get_neutron_data: $(OBJ_GET_DATA)
 endif
 
 display: $(OBJ_DISPLAY) 
-	$(CC) -pthread -lrt -lm -lpng -ljpeg -lSDL2 -lSDL2_ttf -lSDL2_mixer \
-              -Wl,-rpath -Wl,/usr/local/lib \
-              -o $@ $(OBJ_DISPLAY)
+	$(CC) -Wl,-rpath -Wl,/usr/local/lib \
+              -o $@ $(OBJ_DISPLAY) \
+              -pthread -lrt -lm -lpng -ljpeg -lSDL2 -lSDL2_ttf -lSDL2_mixer 
+              
 	sudo chown root:root $@
 	sudo chmod 4777 $@
 

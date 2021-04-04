@@ -1,0 +1,3 @@
+#!/bin/bash
+
+nohup neutron_test >> neutron_test_april4.log &

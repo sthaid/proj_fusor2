@@ -8,15 +8,15 @@ fi
 
 if [ "$1" != "" ]; then
   range_start=$1
-  if [ $range_start -lt 352 ]; then
-    range_start=352.5
+  if [ $range_start -lt 93.7 ]; then
+    range_start=93
   fi
 else
-  range_start=359
+  range_start=101
 fi
-range_end=369.5
+range_end=116.6
 
-./fold $range_start $range_end <../neutron_test.out.rescaled >fold.dat
+./fold $range_start $range_end <../neutron_test_april4.out >fold.dat
 if [ $? -ne 0 ]; then
   echo "ERROR: fold failed"
   exit

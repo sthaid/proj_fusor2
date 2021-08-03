@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# to install:
+# - yum install gnuplot
+#
+# helpful websites
+# - http://www.gnuplot.info/
+# - http://www.gnuplot.info/docs_5.4/Gnuplot_5.4.pdf
+# - https://alvinalexander.com/technology/gnuplot-charts-graphs-examples/
+#
+# examples:
+# - gnuplot  -e "set term"      # list supported term types
+
+file=neutron_test_april4.out
+
+term_size="1600,880"
+size_ratio=0.50
+
+gnuplot -p \
+  -e "set term x11 size $term_size" \
+  -e "set size ratio $size_ratio" \
+  -e "set xrange [*:*]" \
+  -e "plot '$file' with lines linewidth 2"

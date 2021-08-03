@@ -95,10 +95,18 @@ hourly average values are passed to gnuplot, which fits a cosine function. This 
 shows the minimum to occur 2.92 hours after midnight. This is the approach that I prefer.
 
 ======================================
-RUN NEXT - TODO
+RUN_4_14_2021
 ======================================
 
-I plan to collect data again, 3 months from now. And compare the results. If the minimum
-shifts by 6 hours then I would say it is likely the neutron counts are resulting from 
-the Milky Way.
+This directory contains results for data collected from 4/4/2021 to 4/27/2021.
 
+The new fit and fold directories are similar to RUN_12_18_2002:
+         
+                          Time of Minimum
+        Technique       12_18_2020      4_14_2021
+        ---------       ----------      ---------
+        fit               3.57           4.38
+
+        fold              2.92           4.65
+
+Web search has not turned up any references to periodic daily neutron count rate.
